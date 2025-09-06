@@ -1,33 +1,66 @@
-# Optional Desktop Applications - Flatpak First
+# Optional Desktop Applications
 
-This directory contains **optional GUI/desktop applications** that users can choose to install.
-
-## Installation Strategy: Flatpak First
-
-Optional desktop applications prioritize Flatpak for better security and user experience:
-
-1. **🥇 Flatpak (Flathub)** - Primary choice
-   - Sandboxed security model
-   - Automatic updates independent of system
-   - Consistent versions across distributions
-   - No dependency conflicts with system packages
-
-2. **🥈 APT packages** - Fallback
-   - When application not available on Flathub
-   - For applications requiring deep system integration
-
-3. **🥉 External .deb files** - Last resort
-   - Vendor-specific applications
-   - When neither Flatpak nor APT available
+This directory contains installers for optional desktop applications using Flatpak-first strategy.
 
 ## Categories
 
-### Development Tools (`development.sh`)
-- **VS Code** - `com.visualstudio.code` (Flatpak) / `code` (APT)
-- **IntelliJ IDEA** - `com.jetbrains.IntelliJ-IDEA-Community` (Flatpak)
-- **GitKraken** - `com.axosoft.GitKraken` (Flatpak)
-- **Postman** - `com.getpostman.Postman` (Flatpak)
-- **DBeaver** - `io.dbeaver.DBeaverCommunity` (Flatpak)
+### Multimedia (`multimedia.sh`)
+- **VLC Media Player** - Universal media player
+- **GIMP** - Advanced image editor
+- **Audacity** - Audio editor and recorder
+- **OBS Studio** - Live streaming and recording
+- **Spotify** - Music streaming service
+- **Pinta** - Simple image editor
+- **Flameshot** - Screenshot tool
+
+### Development (`development.sh`)
+- **Visual Studio Code** - Microsoft's code editor
+- **VSCodium** - Open source build of VS Code
+- **Cursor** - AI-powered code editor
+- **Zed** - High-performance code editor
+- **RubyMine** - JetBrains Ruby IDE
+
+### Productivity (`productivity.sh`)
+- **LibreOffice** - Complete office suite
+- **Obsidian** - Knowledge management and note-taking
+- **Signal** - Secure messaging
+- **1Password** - Password manager
+- **Dropbox** - Cloud storage
+- **Zoom** - Video conferencing
+
+### Gaming & Entertainment (`gaming.sh`)
+- **Steam** - Gaming platform
+- **RetroArch** - Multi-platform emulator
+- **PrismLauncher** - Minecraft launcher
+- **Discord** - Voice and text chat for gaming
+
+## Installation Strategy
+
+All applications in this directory use **Flatpak-first strategy**:
+
+1. **Primary**: Install from Flathub when available
+2. **Fallback**: Use official repositories or manual installation
+3. **Benefits**: Sandboxed applications, automatic updates, consistent experience
+
+## Usage
+
+### Interactive Installation
+```bash
+# Install all categories with guided selection
+./install-desktop-apps.sh
+
+# Install specific category
+./multimedia.sh
+./development.sh
+./productivity.sh
+./gaming.sh
+```
+
+### From Main Script
+```bash
+# Use the main Debian-WS installer
+../../../bin/debian-ws.sh
+```
 
 ### Multimedia (`multimedia.sh`)
 - **VLC** - `org.videolan.VLC` (Flatpak) / `vlc` (APT)

@@ -16,7 +16,7 @@
 
 ## 🎯 Overview
 
-Debian-WS transforms a fresh Debian 12 installation into a fully-configured, modern development workstation through a single command. Built on a robust function-based architecture inspired by the [archer project](https://github.com/Edior-DB/archer), this suite refactors and enhances the functionality of [debian-ok](https://github.com/Edior-DB/debian-ok) with improved modularity, security, and maintainability.
+Debian-WS transforms a fresh Debian 12 installation into a fully-configured, modern development workstation through an interactive installer. Built on a robust function-based architecture inspired by the [archer project](https://github.com/Edior-DB/archer), this suite refactors and enhances the functionality of [debian-ok](https://github.com/Edior-DB/debian-ok) with improved modularity, security, and maintainability.
 
 ### Key Improvements from debian-ok
 
@@ -26,6 +26,7 @@ Debian-WS transforms a fresh Debian 12 installation into a fully-configured, mod
 - **🔄 Improved Idempotency**: Safe to run multiple times without side effects
 - **📊 Better Logging**: Centralized logging system with multiple verbosity levels
 - **🧩 Modular Design**: Clean separation of system, application, and configuration logic
+- **🎮 Interactive Interface**: Menu-driven installation with category selection
 
 ## 🚀 Quick Start
 
@@ -36,18 +37,41 @@ Debian-WS transforms a fresh Debian 12 installation into a fully-configured, mod
 - **Internet connection**
 - **Sudo privileges**
 
-### One-Line Installation
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Edior-DB/debian-ws/main/bin/boot.sh | bash
-```
-
-### Alternative Installation Methods
-
-#### Git Clone (Recommended for Development)
+### Interactive Installation
 
 ```bash
 git clone https://github.com/Edior-DB/debian-ws.git
+cd debian-ws
+./bin/debian-ws.sh
+```
+
+## 📦 Installation Categories
+
+### Required System Applications
+Essential tools and applications for a functional Debian workstation:
+
+#### Terminal Required
+- **Core tools**: curl, git, unzip, wget
+- **Gum**: Modern shell prompts and UI components
+- **Fastfetch**: System information display
+
+#### Desktop Required
+- **Alacritty**: Modern terminal emulator
+- **Firefox ESR**: Web browser (from Debian repos)
+- **GNOME essentials**: Tweaks, Sushi, Extensions
+- **System fonts**: Meslo Nerd Font, iA Writer Mono
+- **Flatpak setup**: Desktop app platform
+
+### Optional Applications
+
+#### Desktop Applications (Flatpak-first)
+- **Multimedia**: VLC, GIMP, Audacity, OBS Studio, Spotify, Flameshot
+- **Development**: VSCode, VSCodium, Cursor, Zed, RubyMine
+- **Productivity**: LibreOffice, Obsidian, Signal, 1Password, Zoom
+- **Gaming**: Steam, RetroArch, PrismLauncher, Discord
+
+#### Terminal Applications
+- Coming in future releases
 cd debian-ws
 ./bin/debian-ws.sh
 ```

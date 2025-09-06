@@ -9,7 +9,7 @@ debian-ws/install/
 ├── system/                    # REQUIRED applications (APT only)
 │   ├── base.sh               # Essential system packages
 │   ├── terminal-required.sh  # Required terminal apps (git, curl, etc.)
-│   ├── desktop-required.sh   # Required desktop apps (firefox-esr, etc.) 
+│   ├── desktop-required.sh   # Required desktop apps (firefox-esr, etc.)
 │   ├── security.sh           # Security tools
 │   └── utilities.sh          # System utilities
 └── apps/                     # OPTIONAL applications
@@ -49,13 +49,13 @@ debian-ws/install/
 install_required_application() {
     local app_name="$1"
     local package_name="$2"
-    
+
     # APT only - no alternatives for required apps
     if ! install_package "$package_name"; then
         log_error "Failed to install required $app_name"
         return 1
     fi
-    
+
     log_success "$app_name installed successfully"
 }
 ```
@@ -66,19 +66,19 @@ install_optional_desktop_application() {
     local app_name="$1"
     local flatpak_id="$2"
     local apt_package="$3"
-    
+
     # Try Flatpak first for optional desktop apps
     if install_flatpak_app "$flatpak_id"; then
         log_success "$app_name installed via Flatpak"
         return 0
     fi
-    
+
     # Fallback to APT
     if install_package "$apt_package"; then
         log_success "$app_name installed via APT"
         return 0
     fi
-    
+
     log_error "Failed to install $app_name"
     return 1
 }
