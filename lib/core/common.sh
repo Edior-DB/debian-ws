@@ -12,6 +12,7 @@ DEBIAN_WS_COMMON_FUNCS_LOADED=1
 # Source required dependencies
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 source "$SCRIPT_DIR/logging.sh"
+source "$SCRIPT_DIR/version.sh"
 
 # ============================================================================
 # USER INTERFACE FUNCTIONS (GUM-based)
@@ -232,20 +233,14 @@ check_debian_system() {
         return 1
     fi
 
-    if [[ -f /etc/debian_version ]]; then
-        local debian_version=$(cat /etc/debian_version)
-        log_debug "Detected Debian-based system: version $debian_version"
+    # Basic Debian check (detailed validation done elsewhere)
+    if is_debian; then
+        log_debug "Debian system detected"
         return 0
-    elif [[ -f /etc/os-release ]]; then
-        local os_id=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-        if [[ "$os_id" == "debian" || "$os_id" == "ubuntu" ]]; then
-            log_debug "Detected Debian-based system: $os_id"
-            return 0
-        fi
+    else
+        log_error "This script requires a Debian-based system"
+        return 1
     fi
-
-    log_error "This script requires a Debian-based system"
-    return 1
 }
 
 # Check if user has sudo privileges
@@ -463,13 +458,7 @@ command_exists() {
 
 # Get system architecture
 get_system_arch() {
-    local arch=$(uname -m)
-    case "$arch" in
-        x86_64) echo "amd64" ;;
-        aarch64) echo "arm64" ;;
-        armv7l) echo "armhf" ;;
-        *) echo "$arch" ;;
-    esac
+    get_debian_arch
 }
 
 # Generate random string

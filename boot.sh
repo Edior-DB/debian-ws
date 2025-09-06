@@ -30,7 +30,7 @@ Debian-WS Installer
 ===================
 EOF
 
-echo "Debian-WS is for fresh Debian 12+ (Bookworm or newer) installations only!"
+echo "Debian-WS is for Debian 13 (Trixie) installations only!"
 echo "Press Enter to begin installation, or abort with Ctrl+C."
 read -r
 

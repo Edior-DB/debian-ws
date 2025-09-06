@@ -16,8 +16,17 @@ trap 'debian_ws_error_trap' ERR
 # Source common functions
 source "$(dirname "$0")/lib/core/common.sh"
 source "$(dirname "$0")/lib/core/logging.sh"
+source "$(dirname "$0")/lib/core/version.sh"
+
+show_banner "Debian-WS Installation"
 
 log_info "Starting Debian-WS installation..."
+
+# Perform comprehensive system validation once
+if ! validate_system_requirements; then
+    log_error "System validation failed. Installation cannot continue."
+    exit 1
+fi
 
 # Choose package installer (apt or nala)
 if command -v nala >/dev/null 2>&1; then

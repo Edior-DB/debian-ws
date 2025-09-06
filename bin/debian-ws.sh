@@ -11,6 +11,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 source "$PROJECT_ROOT/lib/core/logging.sh"
 source "$PROJECT_ROOT/lib/core/common.sh"
+source "$PROJECT_ROOT/lib/core/version.sh"
 
 # Display banner
 show_banner() {
@@ -130,6 +131,13 @@ show_status() {
 # Main function
 main() {
     show_banner "Debian-WS Interactive Installer"
+
+    # Perform system validation once at startup
+    log_info "Validating system requirements..."
+    if ! validate_system_requirements; then
+        log_error "System validation failed. Please ensure you're running Debian 13 (Trixie)."
+        exit 1
+    fi
 
     local menu_options=(
         "Install Required System Applications"

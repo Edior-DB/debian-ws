@@ -7,6 +7,7 @@ set -euo pipefail
 
 # Source required dependencies
 source "$(dirname "$0")/../../lib/core/logging.sh"
+source "$(dirname "$0")/../../lib/core/version.sh"
 source "$(dirname "$0")/../../lib/install/apt.sh"
 
 # Setup Flatpak for desktop environment
@@ -20,6 +21,12 @@ setup_flatpak_desktop() {
         "flatpak"
         "gnome-software-plugin-flatpak"
     )
+
+    # Validate package availability for Debian 13
+    if ! validate_package_list "${packages[@]}"; then
+        log_error "Flatpak packages are not available in Debian 13"
+        return 1
+    fi
 
     if ! install_packages "${packages[@]}"; then
         log_error "Failed to install Flatpak packages"
@@ -48,6 +55,12 @@ install_gnome_essentials() {
         "gnome-shell-extensions"
         "chrome-gnome-shell"
     )
+
+    # Validate package availability for Debian 13
+    if ! validate_package_list "${packages[@]}"; then
+        log_error "Some GNOME packages are not available in Debian 13"
+        return 1
+    fi
 
     if ! install_packages "${packages[@]}"; then
         log_error "Failed to install GNOME essentials"

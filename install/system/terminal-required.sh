@@ -8,6 +8,7 @@ set -euo pipefail
 # Source required libraries
 source "$(dirname "$0")/../../lib/core/logging.sh"
 source "$(dirname "$0")/../../lib/core/common.sh"
+source "$(dirname "$0")/../../lib/core/version.sh"
 source "$(dirname "$0")/../../lib/install/apt.sh"
 
 # Install core terminal tools from APT
@@ -22,6 +23,12 @@ install_core_terminal_tools() {
         "tree"
         "bash-completion"
     )
+
+    # Validate package availability for Debian 13
+    if ! validate_package_list "${core_tools[@]}"; then
+        log_error "Some core terminal tools are not available in Debian 13"
+        return 1
+    fi
 
     if ! install_with_retries "${core_tools[@]}"; then
         log_error "Failed to install core terminal tools"

@@ -3,10 +3,10 @@
 <div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Debian 12+](https://img.shields.io/badge/Debian-12%2B-red.svg)](https://www.debian.org/)
+[![Debian 13](https://img.shields.io/badge/Debian-13%20Trixie-red.svg)](https://www.debian.org/)
 [![GNOME](https://img.shields.io/badge/Desktop-GNOME-blue.svg)](https://www.gnome.org/)
 
-*A comprehensive, security-focused Debian 12+ installation and configuration suite with function-based architecture*
+*A comprehensive, security-focused Debian 13 (Trixie) installation and configuration suite with function-based architecture*
 
 [Quick Start](#quick-start) • [Features](#features) • [Documentation](#documentation) • [Contributing](#contributing)
 
@@ -16,7 +16,7 @@
 
 ## 🎯 Overview
 
-Debian-WS transforms a fresh Debian 12 installation into a fully-configured, modern development workstation through an interactive installer. This project is a continuation and evolution of [debian-ok](https://github.com/Edior-DB/debian-ok), which was originally inspired by [Omakub](https://omakub.org/). The current implementation draws additional inspiration from Chris Titus's [LinUtil](https://github.com/ChrisTitusTech/linutil) for its modular approach and user experience design.
+Debian-WS transforms a fresh Debian 13 (Trixie) installation into a fully-configured, modern development workstation through an interactive installer. This project is a continuation and evolution of [debian-ok](https://github.com/Edior-DB/debian-ok), which was originally inspired by [Omakub](https://omakub.org/). The current implementation draws additional inspiration from Chris Titus's [LinUtil](https://github.com/ChrisTitusTech/linutil) for its modular approach and user experience design.
 
 Built on a robust function-based architecture inspired by the [archer project](https://github.com/Edior-DB/archer), this suite refactors and enhances the functionality of debian-ok with improved modularity, security, and maintainability.
 
