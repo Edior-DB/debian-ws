@@ -1,0 +1,163 @@
+# Debian-WS Project .gitignore
+
+# Operating System generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-*
+.vim/
+
+# Logs and runtime files
+*.log
+*.pid
+*.lock
+*.tmp
+*.temp
+/tmp/
+/logs/
+/var/log/
+
+# Configuration and cache directories
+.cache/
+.config/
+.local/
+.bash_history
+.zsh_history
+.ssh/known_hosts
+.gnupg/
+
+# Package manager files
+node_modules/
+*.deb
+*.rpm
+*.pkg
+*.dmg
+*.tar.gz
+*.zip
+*.rar
+
+# Build artifacts
+build/
+dist/
+target/
+bin/compiled/
+*.o
+*.so
+*.dylib
+*.exe
+
+# Test and coverage files
+coverage/
+.coverage
+.pytest_cache/
+.tox/
+.coverage.*
+htmlcov/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+secrets.*
+private.*
+credential*
+*.key
+*.pem
+*.p12
+*.pfx
+
+# User-specific configuration overrides
+user-config.sh
+personal-settings.sh
+local-overrides.sh
+my-*
+
+# Installation temporary files
+install-*.log
+setup-*.log
+download-cache/
+install-cache/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+*~
+
+# Documentation build files
+docs/_build/
+docs/build/
+*.epub
+*.pdf
+site/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Archive files in working directory
+downloads/
+archives/
+*.tar.*
+*.tgz
+*.tbz2
+
+# IDE and editor specific
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+*.code-workspace
+
+# OS-specific files
+desktop.ini
+$RECYCLE.BIN/
+
+# Python bytecode (if any Python scripts are added)
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Any personal notes or local documentation
+NOTES.md
+TODO.md
+PERSONAL_*
+LOCAL_*
+
+# Git-related (for submodules or patches)
+*.patch
+*.diff
+.git-rewrite/
+
+# Any test system or sandbox directories
+test-system/
+sandbox/
+testing/
+experiments/
+
+# User data and personal files
+user-data/
+personal/
+private/
+my-configs/
