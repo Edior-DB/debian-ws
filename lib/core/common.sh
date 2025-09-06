@@ -4,7 +4,7 @@
 # Source this file in other scripts: source "$(dirname "${BASH_SOURCE[0]}")/../core/common.sh"
 
 # Prevent multiple sourcing
-if [[ "${DEBIAN_WS_COMMON_FUNCS_LOADED}" == "1" ]]; then
+if [[ "${DEBIAN_WS_COMMON_FUNCS_LOADED:-}" == "1" ]]; then
     return 0
 fi
 DEBIAN_WS_COMMON_FUNCS_LOADED=1
@@ -198,25 +198,24 @@ download_with_retries() {
     local retry_count=0
 
     if [[ -z "$url" || -z "$output_file" ]]; then
-        log_error "URL and output file are required for download"
+        log_error "URL and output file must be specified"
         return 1
     fi
 
-    while [ $retry_count -lt $max_retries ]; do
+    while [[ $retry_count -lt $max_retries ]]; do
         log_info "Downloading: $url - Attempt $((retry_count + 1)) of $max_retries"
 
-        if wget -q -O "$output_file" "$url"; then
-            log_success "Download completed: $output_file"
+        if curl -o "$output_file" "$url"; then
+            log_success "File downloaded successfully: $output_file"
             return 0
         fi
 
         retry_count=$((retry_count + 1))
-        if [ $retry_count -lt $max_retries ]; then
+        if [[ $retry_count -lt $max_retries ]]; then
             log_warning "Download failed, retrying in 3 seconds..."
             sleep 3
         else
-            log_error "Download failed after $max_retries attempts: $url"
-            rm -f "$output_file"
+            log_error "Download failed after $max_retries attempts!"
             return 1
         fi
     done
@@ -299,13 +298,8 @@ check_gnome_desktop() {
     if [[ "${XDG_CURRENT_DESKTOP:-}" == *"GNOME"* ]] || [[ "${DESKTOP_SESSION:-}" == *"gnome"* ]]; then
         log_debug "GNOME desktop environment detected"
         return 0
-    elif [[ -n "${GNOME_DESKTOP_SESSION_ID:-}" ]]; then
-        log_debug "GNOME desktop environment detected (legacy detection)"
-        return 0
     else
-        log_warning "GNOME desktop environment not detected"
-        log_info "Current desktop: ${XDG_CURRENT_DESKTOP:-Unknown}"
-        log_info "This tool is optimized for GNOME desktop environment"
+        log_debug "GNOME desktop environment not detected"
         return 1
     fi
 }
@@ -317,13 +311,13 @@ check_gnome_desktop() {
 # Standard script headers
 show_banner() {
     local title="$1"
-    local color="${2:-$COLOR_BLUE}"
+    local color="${2:-$BLUE}"
 
     echo -e "$color"
     echo "========================================================================="
     echo "                    $title"
     echo "========================================================================="
-    echo -e "$COLOR_RESET"
+    echo -e "$NC"
 }
 
 # Show completion message
@@ -331,14 +325,14 @@ show_completion() {
     local title="$1"
     local description="$2"
 
-    echo -e "$COLOR_GREEN"
+    echo -e "$GREEN"
     echo "========================================================================="
     echo "                    $title"
     echo "========================================================================="
     echo ""
     echo -e "$description"
     echo ""
-    echo -e "$COLOR_RESET"
+    echo -e "$NC"
 }
 
 # Show progress indicator
@@ -360,8 +354,8 @@ show_progress() {
         progress_bar+="░"
     done
 
-    printf "\r${COLOR_CYAN}[%s] %d%% (%d/%d) %s${COLOR_RESET}" \
-           "$progress_bar" "$percentage" "$current" "$total" "$description"
+    printf "\r${CYAN}[%s] %d%% (%d/%d) %s${NC}" \
+        "$progress_bar" "$percentage" "$current" "$total" "$description"
 
     if [[ $current -eq $total ]]; then
         echo # New line when complete
@@ -407,14 +401,12 @@ backup_file() {
         return 1
     fi
 
-    local backup_path="${file_path}${backup_suffix}"
-
+    local backup_path="$file_path$backup_suffix"
     if cp "$file_path" "$backup_path"; then
-        log_debug "Created backup: $backup_path"
-        echo "$backup_path"
+        log_debug "Backup created: $backup_path"
         return 0
     else
-        log_error "Failed to create backup of: $file_path"
+        log_error "Failed to create backup: $backup_path"
         return 1
     fi
 }
@@ -454,3 +446,4 @@ cleanup_common() {
 trap cleanup_common EXIT
 
 log_debug "Common functions library loaded"
+

@@ -5,6 +5,12 @@
 
 set -euo pipefail
 
+# Prevent multiple sourcing
+if [[ "${DEBIAN_WS_LOGGING_LOADED:-}" == "1" ]]; then
+    return 0
+fi
+DEBIAN_WS_LOGGING_LOADED=1
+
 # Color codes for output
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
