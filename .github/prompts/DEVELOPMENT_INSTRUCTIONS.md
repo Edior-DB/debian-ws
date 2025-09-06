@@ -112,6 +112,8 @@ setup_backports()         # Configure backports
 setup_flatpak()           # Initialize Flatpak
 add_flathub()             # Add Flathub repository
 install_flatpak_app()     # Install Flatpak application
+check_flatpak_available() # Check if app exists on Flathub
+list_flatpak_apps()      # List installed Flatpak apps
 ```
 
 **external.sh** - External downloads
@@ -119,6 +121,62 @@ install_flatpak_app()     # Install Flatpak application
 download_github_release()  # Download from GitHub releases
 install_appimage()         # Install AppImage
 install_binary()           # Install standalone binary
+install_from_deb_url()     # Download and install .deb file
+```
+
+#### Application Installation Strategy
+
+**Terminal Applications** (`install/terminal/`)
+- Use APT packages for system tools
+- External downloads for specialized tools
+- Manual builds for cutting-edge tools
+
+**Desktop Applications** (`install/desktop/`)
+- **Primary**: Flatpak from Flathub (sandboxed, auto-updates)
+- **Secondary**: APT packages (when Flatpak unavailable)
+- **Tertiary**: External .deb files (vendor-specific)
+- **Last resort**: Snap packages
+
+**Flatpak Installation Pattern**:
+```bash
+# Desktop application installation template
+install_desktop_application() {
+    local app_name="$1"
+    local flatpak_id="$2"
+    local apt_package="$3"
+    local deb_url="$4"
+    
+    log_info "Installing $app_name..."
+    
+    # Try Flatpak first (preferred for desktop apps)
+    if [[ -n "$flatpak_id" ]] && check_flatpak_available "$flatpak_id"; then
+        if install_flatpak_app "$flatpak_id"; then
+            log_success "$app_name installed via Flatpak"
+            return 0
+        fi
+    fi
+    
+    # Fallback to APT package
+    if [[ -n "$apt_package" ]] && check_package_available "$apt_package"; then
+        log_info "Flatpak unavailable, using APT: $apt_package"
+        if install_package "$apt_package"; then
+            log_success "$app_name installed via APT"
+            return 0
+        fi
+    fi
+    
+    # Last resort: external .deb
+    if [[ -n "$deb_url" ]]; then
+        log_info "Package managers unavailable, downloading .deb"
+        if install_from_deb_url "$app_name" "$deb_url"; then
+            log_success "$app_name installed from external source"
+            return 0
+        fi
+    fi
+    
+    log_error "Failed to install $app_name through any method"
+    return 1
+}
 ```
 
 #### Configuration Libraries (`lib/config/`)

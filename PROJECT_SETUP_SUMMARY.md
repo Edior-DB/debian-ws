@@ -30,7 +30,7 @@
 ### 3. Git Repository Setup
 - ✅ Properly configured `.gitignore` for development workflow
 - ✅ **Anonymous git identity** configured:
-  - Name: `debian-ws-maintainer` 
+  - Name: `debian-ws-maintainer`
   - Email: `maintainer@debian-ws.local`
 - ✅ **No real name exposure** in git history
 - ✅ Initial commit with comprehensive project documentation

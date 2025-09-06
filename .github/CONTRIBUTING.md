@@ -101,8 +101,31 @@ Place your code in the appropriate directory:
 - **Installation functions**: `lib/install/`
 - **Configuration functions**: `lib/config/`
 - **System installations**: `install/system/`
-- **Application installations**: `install/apps/`
+- **Terminal applications**: `install/terminal/` (APT/external preferred)
+- **Desktop applications**: `install/desktop/` (Flatpak first, APT fallback)
 - **Resources**: `resources/`
+
+#### Application Installation Guidelines
+
+**Terminal Applications** (`install/terminal/`):
+- Use APT packages for system tools and widely available CLI apps
+- External downloads for specialized tools not in Debian repos
+- Manual installation for cutting-edge development tools
+
+**Desktop Applications** (`install/desktop/`):
+- **Primary method**: Flatpak from Flathub (sandboxed, auto-updates)
+- **Secondary method**: APT packages (when Flatpak unavailable)
+- **Fallback method**: External .deb files (vendor-specific apps)
+
+Example desktop app installation:
+```bash
+install_my_desktop_app() {
+    install_desktop_application "MyApp" \
+        "com.example.MyApp" \     # Flatpak ID
+        "myapp" \                 # APT package
+        "https://example.com/myapp.deb"  # External .deb
+}
+```
 
 ### 5. Testing Requirements
 

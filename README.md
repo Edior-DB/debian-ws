@@ -146,18 +146,18 @@ Example function structure:
 # Returns: 0 on success, 1 on failure
 install_package() {
     local package="$1"
-    
+
     if check_package_installed "$package"; then
         log_info "$package is already installed"
         return 0
     fi
-    
+
     log_info "Installing $package..."
     if ! apt install -y "$package"; then
         log_error "Failed to install $package"
         return 1
     fi
-    
+
     log_success "$package installed successfully"
 }
 ```
@@ -260,7 +260,7 @@ cd debian-ws
 ## 🙏 Acknowledgments
 
 - **[debian-ok](https://github.com/Edior-DB/debian-ok)** - Original project foundation
-- **[archer](https://github.com/Edior-DB/archer)** - Function-based architecture inspiration  
+- **[archer](https://github.com/Edior-DB/archer)** - Function-based architecture inspiration
 - **[Chris Titus Tech](https://github.com/ChrisTitusTech)** - Terminal configurations and themes
 - **[Debian Project](https://www.debian.org/)** - The amazing operating system
 - **GNOME Project** - Desktop environment

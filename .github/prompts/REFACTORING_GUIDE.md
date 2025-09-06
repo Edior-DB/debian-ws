@@ -31,30 +31,44 @@ This guide provides specific instructions for refactoring the existing debian-ok
 
 ```
 debian-ok/install/          → debian-ws/install/
-├── terminal/               → ├── system/
-│   ├── required/          → │   ├── base.sh
-│   └── optional/          → │   └── utilities.sh
-├── desktop/               → └── apps/
-│   ├── required/          →     ├── development/
-│   └── optional/          →     ├── multimedia/
-└── *                      →     └── productivity/
+├── terminal/               → ├── terminal/
+│   ├── required/          → │   ├── required/
+│   │   ├── git.sh         → │   │   ├── git.sh
+│   │   ├── curl.sh        → │   │   ├── curl.sh
+│   │   └── fastfetch.sh   → │   │   └── fastfetch.sh
+│   └── optional/          → │   └── optional/
+│       ├── neovim.sh      → │       ├── development.sh
+│       └── ...            → │       └── productivity.sh
+├── desktop/               → ├── desktop/
+│   ├── required/          → │   ├── required/
+│   │   ├── firefox.sh     → │   │   ├── browser.sh (Flatpak first)
+│   │   └── ...            → │   │   └── files.sh
+│   └── optional/          → │   └── optional/
+│       ├── vscode.sh      → │       ├── development.sh (Flatpak first)
+│       ├── gimp.sh        → │       ├── multimedia.sh (Flatpak first)
+│       └── ...            → │       └── productivity.sh (Flatpak first)
+└── *                      → └── system/
+                           →     ├── base.sh
+                           →     └── utilities.sh
 ```
 
 #### Specific Refactoring Tasks
 
-**1. Terminal Tools Refactoring**
+**1. Terminal Tools Refactoring (APT/External preferred)**
 
 Original files in `install/terminal/required/`:
 - `alacritty.sh` → Function in `lib/config/terminal.sh`
-- `fastfetch.sh` → Function in `install/system/utilities.sh`
+- `fastfetch.sh` → Function in `install/terminal/required/fastfetch.sh`
 - `zsh.sh` → Function in `lib/config/terminal.sh`
+- `git.sh` → Function in `install/terminal/required/git.sh`
 
-**2. Desktop Applications Refactoring**
+**2. Desktop Applications Refactoring (Flatpak first)**
 
 Original files in `install/desktop/`:
-- Browser installations → `install/apps/productivity/browsers.sh`
-- Development tools → `install/apps/development/`
-- Media applications → `install/apps/multimedia/`
+- Browser installations → `install/desktop/required/browser.sh` (Firefox via Flatpak)
+- Development tools → `install/desktop/optional/development.sh` (VS Code via Flatpak)
+- Media applications → `install/desktop/optional/multimedia.sh` (VLC, GIMP via Flatpak)
+- Office applications → `install/desktop/optional/productivity.sh` (LibreOffice via Flatpak)
 
 **3. Configuration Files Refactoring**
 
@@ -136,7 +150,101 @@ configure_gnome_dark_theme() {
 }
 ```
 
-#### Pattern 3: External Package Installation
+#### Pattern 3: Desktop Application Installation (Flatpak First)
+
+**Before (debian-ok style):**
+```bash
+# install/desktop/optional/firefox.sh
+if ! command -v firefox &> /dev/null; then
+    echo "Installing Firefox..."
+    sudo apt update
+    sudo apt install -y firefox-esr
+fi
+```
+
+**After (debian-ws style):**
+```bash
+# install/desktop/required/browser.sh
+install_firefox() {
+    local app_name="Firefox"
+    local flatpak_id="org.mozilla.firefox"
+    local apt_package="firefox-esr"
+    
+    log_info "Installing $app_name browser..."
+    
+    # Flatpak first (preferred for desktop apps)
+    if check_flatpak_available "$flatpak_id"; then
+        if install_flatpak_app "$flatpak_id"; then
+            log_success "$app_name installed via Flatpak"
+            setup_firefox_flatpak_integration
+            return 0
+        fi
+    fi
+    
+    # Fallback to APT
+    log_info "Flatpak unavailable, using APT package: $apt_package"
+    if install_package "$apt_package"; then
+        log_success "$app_name installed via APT"
+        return 0
+    fi
+    
+    log_error "Failed to install $app_name"
+    return 1
+}
+
+# Setup Flatpak integration for better system integration
+setup_firefox_flatpak_integration() {
+    # Allow filesystem access for downloads
+    flatpak override --user --filesystem=xdg-download "$flatpak_id"
+    # Allow theme access
+    flatpak override --user --filesystem=xdg-config/gtk-3.0 "$flatpak_id"
+}
+```
+
+#### Pattern 4: Multi-Application Desktop Module
+
+**Before (multiple separate files):**
+```bash
+# install/desktop/optional/gimp.sh
+# install/desktop/optional/vlc.sh
+# install/desktop/optional/audacity.sh
+```
+
+**After (consolidated multimedia.sh):**
+```bash
+# install/desktop/optional/multimedia.sh
+install_multimedia_apps() {
+    local -A multimedia_apps=(
+        ["GIMP"]="org.gimp.GIMP:gimp:"
+        ["VLC"]="org.videolan.VLC:vlc:"
+        ["Audacity"]="org.audacityteam.Audacity:audacity:"
+        ["OBS Studio"]="com.obsproject.Studio:obs-studio:"
+    )
+    
+    for app_name in "${!multimedia_apps[@]}"; do
+        IFS=':' read -r flatpak_id apt_package deb_url <<< "${multimedia_apps[$app_name]}"
+        
+        log_info "Installing $app_name..."
+        if install_desktop_application "$app_name" "$flatpak_id" "$apt_package" "$deb_url"; then
+            configure_multimedia_app "$app_name"
+        fi
+    done
+}
+
+configure_multimedia_app() {
+    local app_name="$1"
+    case "$app_name" in
+        "GIMP")
+            # GIMP-specific Flatpak permissions
+            flatpak override --user --filesystem=host org.gimp.GIMP
+            ;;
+        "OBS Studio")
+            # OBS needs camera and microphone access
+            flatpak override --user --device=all com.obsproject.Studio
+            ;;
+    esac
+}
+```
 
 **Before:**
 ```bash
