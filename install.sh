@@ -36,12 +36,12 @@ log_info "Using $INSTALLER as the package manager."
 
 # Install terminal tools
 log_info "Installing terminal tools..."
-source "$(dirname "$0")/install/system/terminal-required.sh"
+bash "$(dirname "$0")/install/system/terminal-required.sh"
 
 # Install desktop tools (if GNOME is detected)
 if check_gnome_desktop; then
   log_info "Installing desktop tools..."
-  source "$(dirname "$0")/install/apps/desktop/install-desktop-apps.sh"
+  bash "$(dirname "$0")/install/system/desktop-required.sh"
 else
   log_warning "GNOME desktop not detected. Skipping desktop tools installation."
 fi

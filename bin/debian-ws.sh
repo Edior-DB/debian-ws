@@ -28,49 +28,6 @@ show_banner() {
     echo
 }
 
-# Check system compatibility
-check_system_compatibility() {
-    log_info "Checking system compatibility..."
-
-    # Check for Debian/Ubuntu system
-    if ! check_debian_system; then
-        return 1
-    fi
-
-    # Check for GNOME desktop environment
-    if ! check_gnome_desktop; then
-        if ! confirm_action "Continue anyway?"; then
-            return 1
-        fi
-    fi
-
-    # Check for sudo access
-    if ! check_sudo_privileges; then
-        return 1
-    fi
-
-    # Check internet connection
-    if ! check_internet; then
-        if ! confirm_action "Continue without internet connection?"; then
-            return 1
-        fi
-    fi
-
-    log_success "System compatibility check passed"
-    return 0
-}# Install required system applications
-install_required_apps() {
-    log_info "Starting required system applications installation..."
-
-    if ! "$PROJECT_ROOT/install/system/install-required.sh"; then
-        log_error "Failed to install required system applications"
-        return 1
-    fi
-
-    log_success "Required system applications installation complete"
-    return 0
-}
-
 # Install optional terminal applications
 install_optional_terminal_apps() {
     log_info "Optional terminal applications installation..."
@@ -174,12 +131,6 @@ show_status() {
 main() {
     show_banner "Debian-WS Interactive Installer"
 
-    # Check system compatibility
-    if ! check_system_compatibility; then
-        log_error "System compatibility check failed"
-        exit 1
-    fi
-
     local menu_options=(
         "Install Required System Applications"
         "Install Optional Terminal Applications"
@@ -244,5 +195,7 @@ main() {
         echo
         wait_for_input "Press Enter to continue..."
     done
-}# Execute main function
+}
+
+# Execute main function
 main "$@"

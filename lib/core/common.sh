@@ -304,6 +304,51 @@ check_gnome_desktop() {
     fi
 }
 
+# Check system compatibility
+check_system_compatibility() {
+    log_info "Checking system compatibility..."
+
+    # Check for Debian/Ubuntu system
+    if ! check_debian_system; then
+        return 1
+    fi
+
+    # Check for GNOME desktop environment
+    if ! check_gnome_desktop; then
+        if ! confirm_action "Continue anyway?"; then
+            return 1
+        fi
+    fi
+
+    # Check for sudo access
+    if ! check_sudo_privileges; then
+        return 1
+    fi
+
+    # Check internet connection
+    if ! check_internet; then
+        if ! confirm_action "Continue without internet connection?"; then
+            return 1
+        fi
+    fi
+
+    log_success "System compatibility check passed"
+    return 0
+}
+
+# Install required system applications
+install_required_apps() {
+    log_info "Starting required system applications installation..."
+
+    if ! "$PROJECT_ROOT/install/system/install-required.sh"; then
+        log_error "Failed to install required system applications"
+        return 1
+    fi
+
+    log_success "Required system applications installation complete"
+    return 0
+}
+
 # ============================================================================
 # BANNER AND DISPLAY FUNCTIONS
 # ============================================================================
