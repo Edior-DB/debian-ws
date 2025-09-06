@@ -7,6 +7,7 @@ set -euo pipefail
 
 # Source required libraries
 source "$(dirname "$0")/../../lib/core/logging.sh"
+source "$(dirname "$0")/../../lib/core/common.sh"
 source "$(dirname "$0")/../../lib/install/apt.sh"
 
 # Install core terminal tools from APT
@@ -22,12 +23,10 @@ install_core_terminal_tools() {
         "bash-completion"
     )
 
-    for tool in "${core_tools[@]}"; do
-        if ! install_required_application "$tool" "$tool"; then
-            log_error "Failed to install required tool: $tool"
-            return 1
-        fi
-    done
+    if ! install_with_retries "${core_tools[@]}"; then
+        log_error "Failed to install core terminal tools"
+        return 1
+    fi
 
     log_success "Core terminal tools installed successfully"
     return 0

@@ -10,32 +10,21 @@ SCRIPT_DIR="$(dirname "$0")"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 source "$PROJECT_ROOT/lib/core/logging.sh"
+source "$PROJECT_ROOT/lib/core/common.sh"
 
 # Display banner
 show_banner() {
+    local title="${1:-Debian Workstation Setup Tool}"
     echo "
-██████╗ ███████╗██████╗ ██╗ █████╗ ███╗   ██╗    ██╗    ██╗███████╗
+██████╗ ███████╗██████╗ ██╗ █████╗ ███╗   ██║    ██╗    ██╗███████╗
 ██╔══██╗██╔════╝██╔══██╗██║██╔══██╗████╗  ██║    ██║    ██║██╔════╝
 ██║  ██║█████╗  ██████╔╝██║███████║██╔██╗ ██║    ██║ █╗ ██║███████╗
 ██║  ██║██╔══╝  ██╔══██╗██║██╔══██║██║╚██╗██║    ██║███╗██║╚════██║
 ██████╔╝███████╗██████╔╝██║██║  ██║██║ ╚████║    ╚███╔███╔╝███████║
 ╚═════╝ ╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝     ╚══╝╚══╝ ╚══════╝
 "
-    echo "Debian Workstation Setup Tool"
+    echo "$title"
     echo "=============================="
-    echo
-}
-
-# Show main menu
-show_main_menu() {
-    echo "Main Menu:"
-    echo "  1. Install Required System Applications"
-    echo "  2. Install Optional Terminal Applications"
-    echo "  3. Install Optional Desktop Applications"
-    echo "  4. System Configuration"
-    echo "  5. Update System"
-    echo "  6. Show Installation Status"
-    echo "  7. Exit"
     echo
 }
 
@@ -43,36 +32,33 @@ show_main_menu() {
 check_system_compatibility() {
     log_info "Checking system compatibility..."
 
-    # Check for Debian/Ubuntu
-    if ! command -v apt &> /dev/null; then
-        log_error "This tool requires a Debian-based system with APT package manager"
+    # Check for Debian/Ubuntu system
+    if ! check_debian_system; then
         return 1
     fi
 
     # Check for GNOME desktop environment
-    if [[ "${XDG_CURRENT_DESKTOP:-}" != *"GNOME"* ]] && [[ "${DESKTOP_SESSION:-}" != *"gnome"* ]]; then
-        log_warning "This tool is optimized for GNOME desktop environment"
-        echo "Current desktop: ${XDG_CURRENT_DESKTOP:-Unknown}"
-        read -p "Continue anyway? (y/N): " continue_choice
-        if [[ "${continue_choice,,}" != "y" ]]; then
+    if ! check_gnome_desktop; then
+        if ! confirm_action "Continue anyway?"; then
             return 1
         fi
     fi
 
     # Check for sudo access
-    if ! sudo -n true 2>/dev/null; then
-        log_info "Testing sudo access..."
-        if ! sudo true; then
-            log_error "This tool requires sudo access"
+    if ! check_sudo_privileges; then
+        return 1
+    fi
+
+    # Check internet connection
+    if ! check_internet; then
+        if ! confirm_action "Continue without internet connection?"; then
             return 1
         fi
     fi
 
     log_success "System compatibility check passed"
     return 0
-}
-
-# Install required system applications
+}# Install required system applications
 install_required_apps() {
     log_info "Starting required system applications installation..."
 
@@ -186,7 +172,7 @@ show_status() {
 
 # Main function
 main() {
-    show_banner
+    show_banner "Debian-WS Interactive Installer"
 
     # Check system compatibility
     if ! check_system_compatibility; then
@@ -194,32 +180,59 @@ main() {
         exit 1
     fi
 
+    local menu_options=(
+        "Install Required System Applications"
+        "Install Optional Terminal Applications"
+        "Install Optional Desktop Applications"
+        "System Configuration"
+        "Update System"
+        "Show Installation Status"
+        "Exit"
+    )
+
     while true; do
         echo
-        show_main_menu
-        read -p "Select option (1-7): " choice
-        echo
+        log_info "Select an option:"
 
+        local choice
+        if command -v gum &> /dev/null; then
+            choice=$(gum choose "${menu_options[@]}")
+        else
+            # Fallback without gum
+            for i in "${!menu_options[@]}"; do
+                echo "  $((i+1)). ${menu_options[$i]}"
+            done
+            echo
+            read -p "Select option (1-7): " choice_num
+            if [[ "$choice_num" =~ ^[1-7]$ ]]; then
+                choice="${menu_options[$((choice_num-1))]}"
+            else
+                log_error "Invalid option: $choice_num"
+                continue
+            fi
+        fi
+
+        echo
         case "$choice" in
-            1)
+            "Install Required System Applications")
                 install_required_apps
                 ;;
-            2)
+            "Install Optional Terminal Applications")
                 install_optional_terminal_apps
                 ;;
-            3)
+            "Install Optional Desktop Applications")
                 install_optional_desktop_apps
                 ;;
-            4)
+            "System Configuration")
                 configure_system
                 ;;
-            5)
+            "Update System")
                 update_system
                 ;;
-            6)
+            "Show Installation Status")
                 show_status
                 ;;
-            7)
+            "Exit")
                 log_info "Exiting Debian-WS installer"
                 exit 0
                 ;;
@@ -229,9 +242,7 @@ main() {
         esac
 
         echo
-        read -p "Press Enter to continue..."
+        wait_for_input "Press Enter to continue..."
     done
-}
-
-# Execute main function
+}# Execute main function
 main "$@"

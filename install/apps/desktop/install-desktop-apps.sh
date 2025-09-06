@@ -7,6 +7,7 @@ set -euo pipefail
 
 # Source required dependencies
 source "$(dirname "$0")/../../../lib/core/logging.sh"
+source "$(dirname "$0")/../../../lib/core/common.sh"
 
 # Script directory
 SCRIPT_DIR="$(dirname "$0")"
@@ -16,50 +17,50 @@ SCRIPT_DIR="$(dirname "$0")"
 install_optional_desktop_apps() {
     log_info "Starting optional desktop applications installation..."
 
-    echo "Welcome to Debian-WS Optional Desktop Applications Installer"
-    echo "=========================================================="
-    echo
-    echo "Available categories:"
-    echo "  1. Multimedia (VLC, GIMP, Audacity, OBS, Spotify, etc.)"
-    echo "  2. Development (VSCode, VSCodium, Cursor, Zed, RubyMine, etc.)"
-    echo "  3. Productivity (LibreOffice, Obsidian, Signal, 1Password, etc.)"
-    echo "  4. Gaming & Entertainment (Steam, RetroArch, Minecraft, Discord)"
-    echo "  5. All categories"
-    echo "  6. Custom selection"
-    echo
+    show_banner "Debian-WS Optional Desktop Applications"
 
-    read -p "Select category (1-6): " category_choice
+    local categories=(
+        "Multimedia (VLC, GIMP, Audacity, OBS, Spotify, etc.)"
+        "Development (VSCode, VSCodium, Cursor, Zed, RubyMine, etc.)"
+        "Productivity (LibreOffice, Obsidian, Signal, 1Password, etc.)"
+        "Gaming & Entertainment (Steam, RetroArch, Minecraft, Discord)"
+        "All categories"
+        "Custom selection"
+    )
+
+    log_info "Available categories:"
+    local category_choice=$(select_option "${categories[@]}")
 
     case "$category_choice" in
-        1)
+        "Multimedia"*)
             log_info "Installing multimedia applications..."
             if ! "$SCRIPT_DIR/multimedia.sh"; then
                 log_error "Failed to install multimedia applications"
                 return 1
             fi
             ;;
-        2)
+        "Development"*)
             log_info "Installing development applications..."
             if ! "$SCRIPT_DIR/development.sh"; then
                 log_error "Failed to install development applications"
                 return 1
             fi
             ;;
-        3)
+        "Productivity"*)
             log_info "Installing productivity applications..."
             if ! "$SCRIPT_DIR/productivity.sh"; then
                 log_error "Failed to install productivity applications"
                 return 1
             fi
             ;;
-        4)
+        "Gaming"*)
             log_info "Installing gaming & entertainment applications..."
             if ! "$SCRIPT_DIR/gaming.sh"; then
                 log_error "Failed to install gaming applications"
                 return 1
             fi
             ;;
-        5)
+        "All categories"*)
             log_info "Installing all categories..."
             local failed=0
 
@@ -88,7 +89,7 @@ install_optional_desktop_apps() {
                 return 1
             fi
             ;;
-        6)
+        "Custom selection"*)
             log_info "Custom selection mode..."
             echo "You can run individual category scripts:"
             echo "  - Multimedia: $SCRIPT_DIR/multimedia.sh"
