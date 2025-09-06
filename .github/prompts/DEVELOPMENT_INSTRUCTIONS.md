@@ -126,29 +126,58 @@ install_from_deb_url()     # Download and install .deb file
 
 #### Application Installation Strategy
 
-**Terminal Applications** (`install/terminal/`)
+**Required Applications** (`install/system/`)
+- **All from Debian repos**: Both terminal and desktop required apps use APT only
+- **System integration**: Better package management and dependency resolution
+- **Stability focus**: Use tested, stable versions from official repositories
+
+**Optional Terminal Applications** (`install/apps/terminal/`)
 - Use APT packages for system tools
 - External downloads for specialized tools
 - Manual builds for cutting-edge tools
 
-**Desktop Applications** (`install/desktop/`)
+**Optional Desktop Applications** (`install/apps/desktop/`)
 - **Primary**: Flatpak from Flathub (sandboxed, auto-updates)
 - **Secondary**: APT packages (when Flatpak unavailable)
 - **Tertiary**: External .deb files (vendor-specific)
 - **Last resort**: Snap packages
 
-**Flatpak Installation Pattern**:
+**Required Application Installation Pattern**:
 ```bash
-# Desktop application installation template
-install_desktop_application() {
+# Required applications (system directory) - APT only
+install_required_application() {
+    local app_name="$1"
+    local package_name="$2"
+
+    log_info "Installing required $app_name..."
+
+    if check_package_installed "$package_name"; then
+        log_info "$app_name already installed"
+        return 0
+    fi
+
+    if ! install_package "$package_name"; then
+        log_error "Failed to install required $app_name"
+        return 1
+    fi
+
+    log_success "$app_name installed successfully"
+    return 0
+}
+```
+
+**Optional Desktop Application Installation Pattern**:
+```bash
+# Optional desktop applications - Flatpak first
+install_optional_desktop_application() {
     local app_name="$1"
     local flatpak_id="$2"
     local apt_package="$3"
     local deb_url="$4"
 
-    log_info "Installing $app_name..."
+    log_info "Installing optional $app_name..."
 
-    # Try Flatpak first (preferred for desktop apps)
+    # Try Flatpak first (preferred for optional desktop apps)
     if [[ -n "$flatpak_id" ]] && check_flatpak_available "$flatpak_id"; then
         if install_flatpak_app "$flatpak_id"; then
             log_success "$app_name installed via Flatpak"
@@ -177,9 +206,7 @@ install_desktop_application() {
     log_error "Failed to install $app_name through any method"
     return 1
 }
-```
-
-#### Configuration Libraries (`lib/config/`)
+```#### Configuration Libraries (`lib/config/`)
 
 **gnome.sh** - GNOME configuration
 ```bash

@@ -36,25 +36,19 @@ debian-ws/
 │       ├── terminal.sh         # Terminal configurations
 │       └── dotfiles.sh         # Dotfile management
 ├── install/                     # Installation modules
-│   ├── system/                  # Core system installations
+│   ├── system/                  # Required system and application packages
 │   │   ├── base.sh             # Essential system packages
 │   │   ├── security.sh         # Security tools and configurations
 │   │   ├── drivers.sh          # Hardware drivers
-│   │   └── utilities.sh        # System utilities
-│   ├── terminal/                # Terminal/CLI applications
-│   │   ├── required/            # Essential terminal tools
-│   │   │   ├── git.sh          # Version control
-│   │   │   ├── curl.sh         # HTTP client
-│   │   │   └── fastfetch.sh    # System information
-│   │   └── optional/            # Optional terminal applications
-│   │       ├── development.sh   # Dev tools (neovim, tmux, etc.)
-│   │       ├── network.sh       # Network utilities
-│   │       └── productivity.sh  # CLI productivity tools
-│   └── desktop/                 # Desktop/GUI applications (prefer Flatpak)
-│       ├── required/            # Essential desktop applications
-│       │   ├── browser.sh      # Web browser (Firefox via Flatpak)
-│       │   └── files.sh        # File manager enhancements
-│       └── optional/            # Optional desktop applications
+│   │   ├── utilities.sh        # System utilities
+│   │   ├── terminal-required.sh# Required terminal applications
+│   │   └── desktop-required.sh # Required desktop applications (from Debian repos)
+│   └── apps/                    # Optional applications
+│       ├── terminal/            # Optional CLI/terminal applications
+│       │   ├── development.sh   # Dev tools (neovim, tmux, etc.)
+│       │   ├── network.sh       # Network utilities
+│       │   └── productivity.sh  # CLI productivity tools
+│       └── desktop/             # Optional GUI applications (prefer Flatpak)
 │           ├── development.sh   # IDE/editors (VS Code, etc.)
 │           ├── multimedia.sh    # Media apps (VLC, GIMP, etc.)
 │           ├── productivity.sh  # Office apps (LibreOffice, etc.)
@@ -93,33 +87,67 @@ debian-ws/
 
 ## Application Installation Strategy
 
-### Terminal Applications
-Terminal/CLI applications should be installed using the most appropriate method:
+### Required Applications (`install/system/`)
+All required applications (both terminal and desktop) are installed from Debian repositories:
+1. **APT packages only** - Use official Debian package repositories
+2. **System integration** - Better integration with system package management
+3. **Stability** - Tested and stable versions from Debian
+4. **Dependencies** - Proper dependency resolution through APT
+
+Examples:
+- `firefox-esr` (required desktop browser)
+- `git` (required version control)
+- `curl` (required HTTP client)
+- `gnome-tweaks` (required desktop customization)
+
+### Optional Terminal Applications (`install/apps/terminal/`)
+Optional CLI/terminal applications follow this priority:
 1. **APT packages** for system tools and widely available packages
 2. **External downloads** for tools not in Debian repositories
-3. **Snap packages** as fallback for some development tools
-4. **Manual installation** for specialized tools
+3. **Manual installation** for specialized tools
+4. **Snap packages** as fallback for some development tools
 
-### Desktop Applications (Flatpak First)
-Desktop/GUI applications follow this priority order:
-1. **Flatpak (Flathub)** - Primary choice for desktop applications
+### Optional Desktop Applications (`install/apps/desktop/`) - Flatpak First
+Optional GUI applications follow this priority order:
+1. **Flatpak (Flathub)** - Primary choice for optional desktop applications
    - Sandboxed security model
    - Automatic updates
    - Consistent user experience
-   - Avoid dependency conflicts
+   - Avoid dependency conflicts with system packages
 2. **APT packages** - For applications not available as Flatpak
 3. **External .deb files** - For vendor-specific applications
 4. **Snap packages** - Last resort for GUI applications
 
-### Flatpak Implementation Pattern
+### Installation Implementation Patterns
+
+#### Required Applications Pattern (System)
 ```bash
-# Example: Install desktop application with Flatpak preference
-install_desktop_app() {
+# Example: Install required application from Debian repos
+install_required_app() {
+    local app_name="$1"
+    local package_name="$2"
+
+    log_info "Installing required $app_name..."
+
+    if ! install_package "$package_name"; then
+        log_error "Failed to install required $app_name"
+        return 1
+    fi
+
+    log_success "$app_name installed successfully"
+    return 0
+}
+```
+
+#### Optional Desktop Applications Pattern (Flatpak First)
+```bash
+# Example: Install optional desktop application with Flatpak preference
+install_optional_desktop_app() {
     local app_name="$1"
     local flatpak_id="$2"
     local apt_package="$3"
 
-    # Try Flatpak first
+    # Try Flatpak first for optional desktop apps
     if install_flatpak_app "$flatpak_id"; then
         log_success "$app_name installed via Flatpak"
         return 0
@@ -134,9 +162,7 @@ install_desktop_app() {
         return 1
     fi
 }
-```
-
-## Coding Standards
+```## Coding Standards
 
 1. **Function Naming**: Use descriptive, verb-noun combinations
    - `install_package()`, `check_system()`, `configure_gnome()`

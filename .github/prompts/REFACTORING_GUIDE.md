@@ -31,44 +31,45 @@ This guide provides specific instructions for refactoring the existing debian-ok
 
 ```
 debian-ok/install/          → debian-ws/install/
-├── terminal/               → ├── terminal/
-│   ├── required/          → │   ├── required/
-│   │   ├── git.sh         → │   │   ├── git.sh
-│   │   ├── curl.sh        → │   │   ├── curl.sh
-│   │   └── fastfetch.sh   → │   │   └── fastfetch.sh
-│   └── optional/          → │   └── optional/
-│       ├── neovim.sh      → │       ├── development.sh
-│       └── ...            → │       └── productivity.sh
-├── desktop/               → ├── desktop/
-│   ├── required/          → │   ├── required/
-│   │   ├── firefox.sh     → │   │   ├── browser.sh (Flatpak first)
-│   │   └── ...            → │   │   └── files.sh
-│   └── optional/          → │   └── optional/
-│       ├── vscode.sh      → │       ├── development.sh (Flatpak first)
-│       ├── gimp.sh        → │       ├── multimedia.sh (Flatpak first)
-│       └── ...            → │       └── productivity.sh (Flatpak first)
-└── *                      → └── system/
-                           →     ├── base.sh
-                           →     └── utilities.sh
+├── terminal/               → ├── system/
+│   ├── required/          → │   ├── base.sh
+│   │   ├── git.sh         → │   ├── terminal-required.sh (git, curl, etc.)
+│   │   ├── curl.sh        → │   ├── desktop-required.sh (firefox-esr, etc.)
+│   │   └── fastfetch.sh   → │   ├── security.sh
+│   └── optional/          → │   └── utilities.sh
+│       ├── neovim.sh      → └── apps/
+│       └── ...            →     ├── terminal/
+├── desktop/               →     │   ├── development.sh (neovim, etc.)
+│   ├── required/          →     │   └── productivity.sh
+│   │   ├── firefox.sh     →     └── desktop/
+│   │   └── ...            →         ├── development.sh (VS Code via Flatpak)
+│   └── optional/          →         ├── multimedia.sh (VLC, GIMP via Flatpak)
+│       ├── vscode.sh      →         └── productivity.sh (LibreOffice via Flatpak)
+│       ├── gimp.sh        →
+│       └── ...            →
 ```
 
 #### Specific Refactoring Tasks
 
-**1. Terminal Tools Refactoring (APT/External preferred)**
+**1. Required Applications → System Directory (APT Only)**
 
-Original files in `install/terminal/required/`:
-- `alacritty.sh` → Function in `lib/config/terminal.sh`
-- `fastfetch.sh` → Function in `install/terminal/required/fastfetch.sh`
-- `zsh.sh` → Function in `lib/config/terminal.sh`
-- `git.sh` → Function in `install/terminal/required/git.sh`
+Original required files go to `install/system/`:
+- `install/terminal/required/git.sh` → Function in `install/system/terminal-required.sh`
+- `install/terminal/required/curl.sh` → Function in `install/system/terminal-required.sh`
+- `install/desktop/required/firefox.sh` → Function in `install/system/desktop-required.sh`
 
-**2. Desktop Applications Refactoring (Flatpak first)**
+**2. Optional Terminal Applications → Apps/Terminal (APT/External)**
 
-Original files in `install/desktop/`:
-- Browser installations → `install/desktop/required/browser.sh` (Firefox via Flatpak)
-- Development tools → `install/desktop/optional/development.sh` (VS Code via Flatpak)
-- Media applications → `install/desktop/optional/multimedia.sh` (VLC, GIMP via Flatpak)
-- Office applications → `install/desktop/optional/productivity.sh` (LibreOffice via Flatpak)
+Original optional terminal files go to `install/apps/terminal/`:
+- `install/terminal/optional/neovim.sh` → Function in `install/apps/terminal/development.sh`
+- `install/terminal/optional/tmux.sh` → Function in `install/apps/terminal/development.sh`
+
+**3. Optional Desktop Applications → Apps/Desktop (Flatpak First)**
+
+Original optional desktop files go to `install/apps/desktop/`:
+- `install/desktop/optional/vscode.sh` → Function in `install/apps/desktop/development.sh` (Flatpak first)
+- `install/desktop/optional/gimp.sh` → Function in `install/apps/desktop/multimedia.sh` (Flatpak first)
+- `install/desktop/optional/vlc.sh` → Function in `install/apps/desktop/multimedia.sh` (Flatpak first)
 
 **3. Configuration Files Refactoring**
 
@@ -79,7 +80,7 @@ Original files in various locations:
 
 ### Phase 3: Function Extraction Patterns
 
-#### Pattern 1: Simple Package Installation
+#### Pattern 1: Required Application Installation (APT Only)
 
 **Before (debian-ok style):**
 ```bash
@@ -93,34 +94,63 @@ fi
 
 **After (debian-ws style):**
 ```bash
+# install/system/terminal-required.sh
+install_git() {
+    install_required_application "Git" "git"
+}
+
 # lib/install/apt.sh
-install_package() {
-    local package="$1"
+install_required_application() {
+    local app_name="$1"
+    local package="$2"
 
     if check_package_installed "$package"; then
-        log_info "$package is already installed"
+        log_info "$app_name is already installed"
         return 0
     fi
 
-    log_info "Installing $package..."
+    log_info "Installing required $app_name..."
     update_package_cache
 
     if ! apt install -y "$package"; then
-        log_error "Failed to install $package"
+        log_error "Failed to install required $app_name"
         return 1
     fi
 
-    log_success "$package installed successfully"
+    log_success "$app_name installed successfully"
     return 0
-}
-
-# install/system/base.sh
-install_git() {
-    install_package "git"
 }
 ```
 
-#### Pattern 2: Complex Configuration
+#### Pattern 2: Required Desktop Application (APT Only)
+
+**Before (debian-ok style):**
+```bash
+# install/desktop/required/firefox.sh
+if ! command -v firefox &> /dev/null; then
+    echo "Installing Firefox..."
+    sudo apt update
+    sudo apt install -y firefox-esr
+fi
+```
+
+**After (debian-ws style):**
+```bash
+# install/system/desktop-required.sh
+install_firefox() {
+    install_required_application "Firefox" "firefox-esr"
+
+    # Configure Firefox for system integration
+    configure_firefox_system_integration
+}
+
+configure_firefox_system_integration() {
+    # Set Firefox as default browser
+    if command -v update-alternatives &> /dev/null; then
+        update-alternatives --set x-www-browser /usr/bin/firefox-esr
+    fi
+}
+```#### Pattern 2: Complex Configuration
 
 **Before:**
 ```bash

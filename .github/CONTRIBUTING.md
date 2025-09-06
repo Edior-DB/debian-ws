@@ -100,30 +100,42 @@ Place your code in the appropriate directory:
 - **Core functions**: `lib/core/`
 - **Installation functions**: `lib/install/`
 - **Configuration functions**: `lib/config/`
-- **System installations**: `install/system/`
-- **Terminal applications**: `install/terminal/` (APT/external preferred)
-- **Desktop applications**: `install/desktop/` (Flatpak first, APT fallback)
+- **Required applications**: `install/system/` (APT only, both terminal and desktop)
+- **Optional terminal applications**: `install/apps/terminal/` (APT/external preferred)
+- **Optional desktop applications**: `install/apps/desktop/` (Flatpak first, APT fallback)
 - **Resources**: `resources/`
 
 #### Application Installation Guidelines
 
-**Terminal Applications** (`install/terminal/`):
+**Required Applications** (`install/system/`):
+- **APT packages only** for all required apps (both terminal and desktop)
+- Better system integration and dependency management
+- Examples: `firefox-esr`, `git`, `curl`, `gnome-tweaks`
+
+**Optional Terminal Applications** (`install/apps/terminal/`):
 - Use APT packages for system tools and widely available CLI apps
 - External downloads for specialized tools not in Debian repos
 - Manual installation for cutting-edge development tools
 
-**Desktop Applications** (`install/desktop/`):
+**Optional Desktop Applications** (`install/apps/desktop/`):
 - **Primary method**: Flatpak from Flathub (sandboxed, auto-updates)
 - **Secondary method**: APT packages (when Flatpak unavailable)
 - **Fallback method**: External .deb files (vendor-specific apps)
 
-Example desktop app installation:
+Example required app installation:
 ```bash
-install_my_desktop_app() {
-    install_desktop_application "MyApp" \
-        "com.example.MyApp" \     # Flatpak ID
-        "myapp" \                 # APT package
-        "https://example.com/myapp.deb"  # External .deb
+install_required_firefox() {
+    install_required_application "Firefox" "firefox-esr"
+}
+```
+
+Example optional desktop app installation:
+```bash
+install_optional_vscode() {
+    install_optional_desktop_application "VS Code" \
+        "com.visualstudio.code" \     # Flatpak ID
+        "code" \                      # APT package
+        "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
 }
 ```
 
