@@ -16,7 +16,18 @@
 
 ## 🎯 Overview
 
-Debian-WS transforms a fresh Debian 12 installation into a fully-configured, modern development workstation through an interactive installer. Built on a robust function-based architecture inspired by the [archer project](https://github.com/Edior-DB/archer), this suite refactors and enhances the functionality of [debian-ok](https://github.com/Edior-DB/debian-ok) with improved modularity, security, and maintainability.
+Debian-WS transforms a fresh Debian 12 installation into a fully-configured, modern development workstation through an interactive installer. This project is a continuation and evolution of [debian-ok](https://github.com/Edior-DB/debian-ok), which was originally inspired by [Omakub](https://omakub.org/). The current implementation draws additional inspiration from Chris Titus's [LinUtil](https://github.com/ChrisTitusTech/linutil) for its modular approach and user experience design.
+
+Built on a robust function-based architecture inspired by the [archer project](https://github.com/Edior-DB/archer), this suite refactors and enhances the functionality of debian-ok with improved modularity, security, and maintainability.
+
+### Acknowledgments
+
+This project has been significantly enhanced through contributions from **GitHub Copilot**, which has been instrumental in:
+- Refactoring monolithic scripts into modular, function-based architecture
+- Implementing comprehensive error handling and retry logic
+- Creating interactive UI components with gum integration
+- Developing extensive logging and system detection capabilities
+- Ensuring code quality and maintainability standards
 
 ### Key Improvements from debian-ok
 
@@ -283,11 +294,28 @@ cd debian-ws
 
 ## 🙏 Acknowledgments
 
-- **[debian-ok](https://github.com/Edior-DB/debian-ok)** - Original project foundation
-- **[archer](https://github.com/Edior-DB/archer)** - Function-based architecture inspiration
-- **[Chris Titus Tech](https://github.com/ChrisTitusTech)** - Terminal configurations and themes
-- **[Debian Project](https://www.debian.org/)** - The amazing operating system
-- **GNOME Project** - Desktop environment
+### Project History & Inspirations
+
+This project represents an evolution through multiple iterations and inspirations:
+
+**🔗 Project Lineage:**
+- **[Omakub](https://omakub.org/)** - The original inspiration for automated Ubuntu setup that sparked the debian-ok project
+- **[debian-ok](https://github.com/Edior-DB/debian-ok)** - The direct predecessor to this project, focusing on Debian workstation automation
+- **[archer](https://github.com/Edior-DB/archer)** - Provided the function-based architecture patterns and modular design principles
+- **[LinUtil](https://github.com/ChrisTitusTech/linutil)** - Chris Titus's utility inspired the interactive menu system and user experience design
+
+**🤖 AI-Powered Development:**
+- **GitHub Copilot** - Made crucial contributions to this project's development, including:
+  - Refactoring monolithic scripts into modular, function-based architecture
+  - Implementing robust error handling and retry mechanisms
+  - Creating comprehensive logging and system detection capabilities
+  - Developing interactive UI components with gum integration
+  - Ensuring code quality, documentation, and maintainability standards
+
+**🌟 Community & Projects:**
+- **[Debian Project](https://www.debian.org/)** - The rock-solid foundation operating system
+- **[GNOME Project](https://www.gnome.org/)** - The beautiful and functional desktop environment
+- **[Chris Titus Tech](https://github.com/ChrisTitusTech)** - Terminal configurations, themes, and system optimization insights
 
 ## 📄 License
 
