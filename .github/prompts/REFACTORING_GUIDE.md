@@ -169,9 +169,9 @@ install_firefox() {
     local app_name="Firefox"
     local flatpak_id="org.mozilla.firefox"
     local apt_package="firefox-esr"
-    
+
     log_info "Installing $app_name browser..."
-    
+
     # Flatpak first (preferred for desktop apps)
     if check_flatpak_available "$flatpak_id"; then
         if install_flatpak_app "$flatpak_id"; then
@@ -180,14 +180,14 @@ install_firefox() {
             return 0
         fi
     fi
-    
+
     # Fallback to APT
     log_info "Flatpak unavailable, using APT package: $apt_package"
     if install_package "$apt_package"; then
         log_success "$app_name installed via APT"
         return 0
     fi
-    
+
     log_error "Failed to install $app_name"
     return 1
 }
@@ -220,10 +220,10 @@ install_multimedia_apps() {
         ["Audacity"]="org.audacityteam.Audacity:audacity:"
         ["OBS Studio"]="com.obsproject.Studio:obs-studio:"
     )
-    
+
     for app_name in "${!multimedia_apps[@]}"; do
         IFS=':' read -r flatpak_id apt_package deb_url <<< "${multimedia_apps[$app_name]}"
-        
+
         log_info "Installing $app_name..."
         if install_desktop_application "$app_name" "$flatpak_id" "$apt_package" "$deb_url"; then
             configure_multimedia_app "$app_name"

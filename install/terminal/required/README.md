@@ -28,9 +28,9 @@ source "$(dirname "$0")/../../lib/install/apt.sh"
 install_terminal_app() {
     local app_name="$1"
     local package_name="$2"
-    
+
     log_info "Installing $app_name..."
-    
+
     if install_package "$package_name"; then
         log_success "$app_name installed successfully"
         return 0

@@ -145,9 +145,9 @@ install_desktop_application() {
     local flatpak_id="$2"
     local apt_package="$3"
     local deb_url="$4"
-    
+
     log_info "Installing $app_name..."
-    
+
     # Try Flatpak first (preferred for desktop apps)
     if [[ -n "$flatpak_id" ]] && check_flatpak_available "$flatpak_id"; then
         if install_flatpak_app "$flatpak_id"; then
@@ -155,7 +155,7 @@ install_desktop_application() {
             return 0
         fi
     fi
-    
+
     # Fallback to APT package
     if [[ -n "$apt_package" ]] && check_package_available "$apt_package"; then
         log_info "Flatpak unavailable, using APT: $apt_package"
@@ -164,7 +164,7 @@ install_desktop_application() {
             return 0
         fi
     fi
-    
+
     # Last resort: external .deb
     if [[ -n "$deb_url" ]]; then
         log_info "Package managers unavailable, downloading .deb"
@@ -173,7 +173,7 @@ install_desktop_application() {
             return 0
         fi
     fi
-    
+
     log_error "Failed to install $app_name through any method"
     return 1
 }

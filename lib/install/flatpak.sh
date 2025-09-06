@@ -15,12 +15,12 @@ check_flatpak_ready() {
         log_error "Flatpak not installed"
         return 1
     fi
-    
+
     if ! flatpak remotes | grep -q flathub; then
         log_warning "Flathub repository not configured"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -28,7 +28,7 @@ check_flatpak_ready() {
 # Returns: 0 on success, 1 on failure
 setup_flatpak() {
     log_info "Setting up Flatpak..."
-    
+
     # Install Flatpak if not present
     if ! command -v flatpak &> /dev/null; then
         log_info "Installing Flatpak..."
@@ -37,13 +37,13 @@ setup_flatpak() {
             return 1
         fi
     fi
-    
+
     # Add Flathub repository
     if ! add_flathub; then
         log_error "Failed to add Flathub repository"
         return 1
     fi
-    
+
     log_success "Flatpak setup completed"
     return 0
 }
@@ -52,17 +52,17 @@ setup_flatpak() {
 # Returns: 0 on success, 1 on failure
 add_flathub() {
     log_info "Adding Flathub repository..."
-    
+
     if flatpak remotes | grep -q flathub; then
         log_info "Flathub already configured"
         return 0
     fi
-    
+
     if ! flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo; then
         log_error "Failed to add Flathub repository"
         return 1
     fi
-    
+
     log_success "Flathub repository added"
     return 0
 }
@@ -72,12 +72,12 @@ add_flathub() {
 # Returns: 0 if available, 1 if not
 check_flatpak_available() {
     local flatpak_id="$1"
-    
+
     if [[ -z "$flatpak_id" ]]; then
         log_error "Flatpak ID required"
         return 1
     fi
-    
+
     # Search for the application
     if flatpak search "$flatpak_id" | grep -q "$flatpak_id"; then
         return 0
@@ -92,18 +92,18 @@ check_flatpak_available() {
 # Returns: 0 on success, 1 on failure
 install_flatpak_app() {
     local flatpak_id="$1"
-    
+
     if [[ -z "$flatpak_id" ]]; then
         log_error "Flatpak ID required"
         return 1
     fi
-    
+
     # Check if already installed
     if flatpak list | grep -q "$flatpak_id"; then
         log_info "Flatpak app already installed: $flatpak_id"
         return 0
     fi
-    
+
     # Ensure Flatpak is ready
     if ! check_flatpak_ready; then
         if ! setup_flatpak; then
@@ -111,14 +111,14 @@ install_flatpak_app() {
             return 1
         fi
     fi
-    
+
     log_info "Installing Flatpak app: $flatpak_id"
-    
+
     if ! flatpak install -y flathub "$flatpak_id"; then
         log_error "Failed to install Flatpak app: $flatpak_id"
         return 1
     fi
-    
+
     log_success "Flatpak app installed: $flatpak_id"
     return 0
 }
@@ -128,24 +128,24 @@ install_flatpak_app() {
 # Returns: 0 on success, 1 on failure
 remove_flatpak_app() {
     local flatpak_id="$1"
-    
+
     if [[ -z "$flatpak_id" ]]; then
         log_error "Flatpak ID required"
         return 1
     fi
-    
+
     if ! flatpak list | grep -q "$flatpak_id"; then
         log_info "Flatpak app not installed: $flatpak_id"
         return 0
     fi
-    
+
     log_info "Removing Flatpak app: $flatpak_id"
-    
+
     if ! flatpak uninstall -y "$flatpak_id"; then
         log_error "Failed to remove Flatpak app: $flatpak_id"
         return 1
     fi
-    
+
     log_success "Flatpak app removed: $flatpak_id"
     return 0
 }
@@ -159,7 +159,7 @@ list_flatpak_apps() {
 }
 
 # Desktop application installation with Flatpak preference
-# Args: 
+# Args:
 #   $1 - Application name (for display)
 #   $2 - Flatpak ID
 #   $3 - APT package name (optional)
@@ -170,14 +170,14 @@ install_desktop_application() {
     local flatpak_id="$2"
     local apt_package="${3:-}"
     local deb_url="${4:-}"
-    
+
     if [[ -z "$app_name" || -z "$flatpak_id" ]]; then
         log_error "Application name and Flatpak ID required"
         return 1
     fi
-    
+
     log_info "Installing $app_name..."
-    
+
     # Try Flatpak first (preferred for desktop apps)
     if check_flatpak_available "$flatpak_id"; then
         if install_flatpak_app "$flatpak_id"; then
@@ -185,7 +185,7 @@ install_desktop_application() {
             return 0
         fi
     fi
-    
+
     # Fallback to APT package if provided
     if [[ -n "$apt_package" ]]; then
         log_info "Flatpak unavailable, trying APT package: $apt_package"
@@ -195,7 +195,7 @@ install_desktop_application() {
             return 0
         fi
     fi
-    
+
     # Last resort: external .deb file
     if [[ -n "$deb_url" ]]; then
         log_info "Package managers unavailable, trying external .deb"
@@ -205,7 +205,7 @@ install_desktop_application() {
             return 0
         fi
     fi
-    
+
     log_error "Failed to install $app_name through any method"
     return 1
 }

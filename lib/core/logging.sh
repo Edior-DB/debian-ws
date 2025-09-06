@@ -36,23 +36,23 @@ _log() {
     local prefix="$3"
     shift 3
     local message="$*"
-    
+
     # Check if we should log this level
     if [[ $level -lt $CURRENT_LOG_LEVEL ]]; then
         return 0
     fi
-    
+
     # Create log entry
     local timestamp
     timestamp=$(get_timestamp)
-    
+
     # Output to stderr for errors, stdout for others
     if [[ $level -eq $LOG_ERROR ]]; then
         echo -e "${color}[${timestamp}] ${prefix}: ${message}${NC}" >&2
     else
         echo -e "${color}[${timestamp}] ${prefix}: ${message}${NC}"
     fi
-    
+
     # Log to file if DEBIANWS_LOG_FILE is set
     if [[ -n "${DEBIANWS_LOG_FILE:-}" ]]; then
         echo "[${timestamp}] ${prefix}: ${message}" >> "$DEBIANWS_LOG_FILE"
@@ -97,7 +97,7 @@ log_banner() {
     local message="$1"
     local length=${#message}
     local border=$(printf '=%.0s' $(seq 1 $((length + 4))))
-    
+
     echo -e "${CYAN}${border}${NC}"
     echo -e "${CYAN}  ${message}  ${NC}"
     echo -e "${CYAN}${border}${NC}"
@@ -128,11 +128,11 @@ init_logging() {
                 unset DEBIANWS_LOG_FILE
             }
         fi
-        
+
         # Start new log session
         echo "=== Debian-WS Log Session Started: $(get_timestamp) ===" >> "$DEBIANWS_LOG_FILE"
     fi
-    
+
     # Set log level from environment
     case "${DEBIANWS_LOG_LEVEL:-info}" in
         debug|DEBUG|0) CURRENT_LOG_LEVEL=$LOG_DEBUG ;;
@@ -141,7 +141,7 @@ init_logging() {
         error|ERROR|3) CURRENT_LOG_LEVEL=$LOG_ERROR ;;
         *) CURRENT_LOG_LEVEL=$LOG_INFO ;;
     esac
-    
+
     log_debug "Logging initialized with level: $CURRENT_LOG_LEVEL"
 }
 

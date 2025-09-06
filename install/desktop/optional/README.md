@@ -43,10 +43,10 @@ install_multimedia_suite() {
         ["Audacity"]="org.audacityteam.Audacity:audacity"
         ["OBS Studio"]="com.obsproject.Studio:obs-studio"
     )
-    
+
     for app_name in "${!multimedia_apps[@]}"; do
         IFS=':' read -r flatpak_id apt_package <<< "${multimedia_apps[$app_name]}"
-        
+
         if install_desktop_application "$app_name" "$flatpak_id" "$apt_package"; then
             setup_app_permissions "$app_name" "$flatpak_id"
         fi
@@ -56,7 +56,7 @@ install_multimedia_suite() {
 setup_app_permissions() {
     local app_name="$1"
     local flatpak_id="$2"
-    
+
     case "$app_name" in
         "GIMP")
             # Allow file system access for image editing

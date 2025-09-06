@@ -118,13 +118,13 @@ install_desktop_app() {
     local app_name="$1"
     local flatpak_id="$2"
     local apt_package="$3"
-    
+
     # Try Flatpak first
     if install_flatpak_app "$flatpak_id"; then
         log_success "$app_name installed via Flatpak"
         return 0
     fi
-    
+
     # Fallback to APT if available
     if [[ -n "$apt_package" ]]; then
         log_info "Flatpak unavailable, trying APT package: $apt_package"
